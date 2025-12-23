@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ziyaretçi Takip Sistemi</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.19.3/dist/xlsx.full.min.js"></script>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="logo">Ziyaretçi Takip</div>
+        <ul class="nav-links">
+            <li data-page="dashboard" class="active">Anasayfa</li>
+            <li data-page="register">Kayıt Yap</li>
+            <li data-page="visitors">Ziyaretçiler</li>
+            <li data-page="settings">Ayarlar</li>
+        </ul>
+    </nav>
+
+    <!-- SCROLLING ANNOUNCEMENT BANNER -->
+    <div id="announcement-banner" class="announcement-banner">
+        <div class="announcement-content" id="announcement-text">
+            Duyuru Metni Burada Görünecek
+        </div>
+    </div>
+
+    <div class="container">
+        
+        <!-- DASHBOARD PAGE -->
+        <div id="dashboard" class="page active">
+            <div class="stats-grid">
+                <div class="card stat-card">
+                    <h3>İçeridekiler</h3>
+                    <p id="stat-inside">0</p>
+                </div>
+                <div class="card stat-card">
+                    <h3>Yanıcı Depo</h3>
+                    <p id="stat-yanici">0</p>
+                </div>
+                <div class="card stat-card">
+                    <h3>Hammadde</h3>
+                    <p id="stat-hammadde">0</p>
+                </div>
+                <div class="card stat-card">
+                    <h3>Diğer</h3>
+                    <p id="stat-diger">0</p>
+                </div>
+            </div>
+
+            <div class="dashboard-lists">
+                <div class="card">
+                    <h3>İçeride Olanlar</h3>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Ad Soyad</th>
+                                    <th>Firma</th>
+                                    <th>Bölüm</th>
+                                    <th>Giriş</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dashboard-inside-list">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3>Son 5 Kayıt</h3>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Ad Soyad</th>
+                                    <th>Durum</th>
+                                    <th>Tarih</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dashboard-recent-list">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- REGISTER PAGE -->
+        <div id="register" class="page">
+            <div class="form-container">
+                <div class="form-card">
+                    <h2>Yeni Ziyaretçi Kaydı</h2>
+                    <form id="visitor-form">
+                        <div class="form-grid">
+                            <div class="form-group form-group-with-suggestions">
+                                <label>Ad Soyad *</label>
+                                <input type="text" id="reg-name" required>
+                                <div id="suggestions-name" class="suggestions-box"></div>
+                            </div>
+                            <div class="form-group">
+                                <label>Firma</label>
+                                <input type="text" id="reg-company">
+                            </div>
+                            <div class="form-group">
+                                <label>Telefon / TC</label>
+                                <input type="text" id="reg-phone">
+                            </div>
+                            <div class="form-group">
+                                <label>Container No</label>
+                                <input type="text" id="reg-container">
+                            </div>
+                            <div class="form-group form-group-with-suggestions">
+                                <label>Plaka</label>
+                                <input type="text" id="reg-plate">
+                                <div id="suggestions-plate" class="suggestions-box"></div>
+                                <small id="plate-warning" class="warning-text"></small>
+                            </div>
+                            <div class="form-group">
+                                <label>Gidilen Bölüm</label>
+                                <select id="reg-department">
+                                    <option value="Diğer">Diğer</option>
+                                    <option value="Hammadde">Hammadde</option>
+                                    <option value="Yanıcı Depo">Yanıcı Depo</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Kayıt Yapan</label>
+                                <input type="text" id="reg-registrar">
+                            </div>
+                            <div class="form-group">
+                                <label>Giriş Saati</label>
+                                <input type="text" id="reg-time" disabled>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn-primary btn-block">Kaydet</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- VISITORS LIST PAGE -->
+        <div id="visitors" class="page">
+            <div class="card">
+                <div class="list-header">
+                    <h2>Ziyaretçi Listesi</h2>
+                    <div class="actions">
+                        <input type="text" id="search-input" placeholder="Ara...">
+                        <button id="btn-excel-export" class="btn-secondary">Excel İndir</button>
+                        <label for="excel-import" class="btn-secondary">Excel Yükle</label>
+                        <input type="file" id="excel-import" accept=".csv, .xlsx" style="display:none;">
+                    </div>
+                </div>
+                <div class="filters">
+                    <label><input type="checkbox" id="filter-today" checked> Sadece Bugün</label>
+                    <label><input type="checkbox" id="filter-inside" checked> Çıkış Yapmayanlar</label>
+                </div>
+                <div id="excel-preview" style="display:none;" class="excel-preview">
+                    <h3>Excel Verisi (Tablo Şeklinde)</h3>
+                    <div class="table-container" id="excel-preview-container"></div>
+                </div>
+                <div class="table-container">
+                    <table class="full-table">
+                        <thead>
+                            <tr>
+                                <th>Ad Soyad</th>
+                                <th>Firma</th>
+                                <th>Tel/TC</th>
+                                <th>Container No</th>
+                                <th>Plaka</th>
+                                <th>Bölüm</th>
+                                <th>Giriş</th>
+                                <th>Çıkış</th>
+                                <th>Kayıt Yapan</th>
+                                <th>İşlem</th>
+                            </tr>
+                        </thead>
+                        <tbody id="visitors-table-body">
+                        </tbody>
+                    </table>
+                </div>
+                <div class="pagination">
+                    <button id="prev-page">Önceki</button>
+                    <span id="page-info">Sayfa 1</span>
+                    <button id="next-page">Sonraki</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- SETTINGS PAGE -->
+        <div id="settings" class="page">
+            <div class="settings-container">
+                <div class="card">
+                    <h2>Duyuru Ayarları</h2>
+                    <div class="form-group">
+                        <label>Kayan Yazı Duyurusunu Etkinleştir</label>
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            <input type="checkbox" id="setting-announcement-enabled" style="width: auto; cursor: pointer;">
+                            <span id="announcement-status" style="color: #bbb;">Kapalı</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Duyuru Metni</label>
+                        <textarea id="setting-announcement-text" rows="3" placeholder="Buraya duyuru yazınız..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Duyuru Hızı (saniye)</label>
+                        <input type="number" id="setting-announcement-speed" min="5" max="30" value="15" step="1">
+                        <small style="color: #999;">Daha düşük = daha hızlı</small>
+                    </div>
+                    <button id="save-announcement-settings" class="btn-primary btn-block">Duyuru Ayarlarını Kaydet</button>
+                </div>
+                <div class="card">
+                    <h2>Mail Ayarları</h2>
+                    <div class="form-group">
+                        <label>Mail Alıcıları (virgülle ayırınız)</label>
+                        <input type="email" id="setting-mail-recipients" placeholder="ornek@mail.com, ornek2@mail.com">
+                    </div>
+                    <div class="form-group">
+                        <label>Mail Konusu Şablonu</label>
+                        <input type="text" id="setting-mail-subject" value="Sevkiyat Bilgisi">
+                    </div>
+                    <div class="form-group">
+                        <label>Mail İçeriği Notu</label>
+                        <textarea id="setting-mail-body" rows="3" placeholder="Ek not yazınız (isteğe bağlı)"></textarea>
+                    </div>
+                    <small style="color: #bbb;">NOT: Mail içinde otomatik olarak ziyaretçi bilgileri eklenecektir</small>
+                    <button id="save-settings" class="btn-primary btn-block">Mail Ayarlarını Kaydet</button>
+                </div>
+                <div class="card">
+                    <h2>Tehlikeli İşlemler</h2>
+                    <button id="clear-all-data" class="btn-danger btn-block">Tüm Verileri Temizle</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Loading Indicator -->
+    <div id="loading-indicator" class="loading-indicator" style="display:none;">
+        <div class="spinner"></div>
+        <p>İşlem yapılıyor...</p>
+    </div>
+
+    <!-- Scripts -->
+    <script src="assets/js/storage.js"></script>
+    <script src="assets/js/excel.js"></script>
+    <script src="assets/js/mail.js"></script>
+    <script src="assets/js/app.js"></script>
+</body>
+</html>
